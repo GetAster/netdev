@@ -1,3 +1,9 @@
+> **Aster fork.** This repository is [netdev](https://github.com/shellrow/netdev) plus a patch maintained by
+> [Aster](https://getaster.now), documented in the [Aster patch ledger](docs/aster-patches.md).
+> The patched code is on the `upgrade/*` branches; this `main` branch is upstream
+> `main` plus this notice and the ledger. Upstream maintainers are welcome to
+> incorporate our patch at their discretion.
+
 [crates-badge]: https://img.shields.io/crates/v/netdev.svg
 [crates-url]: https://crates.io/crates/netdev
 [license-badge]: https://img.shields.io/crates/l/netdev.svg
