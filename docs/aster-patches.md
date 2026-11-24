@@ -19,7 +19,7 @@ This repository is Aster's fork of [shellrow/netdev](https://github.com/shellrow
 |---|---|
 | Upstream base | `v0.47.0` (`363c76860cd7da926c49a7f49a45325743aa054c`) |
 | Integration branch | `upgrade/netdev-v0.47.0` |
-| Tag | none yet (`aster-netdev-v0.47.1001`, to be created after the Aster consumer trial passes) |
+| Tag | `aster-netdev-v0.47.1001` (annotated, on `b16a3716ec`; the first release, so no previous tag) |
 | Pinned commit | `b16a3716ecb4261558ffd0055ecd94a3f3ff66ae` |
 | Crate version | 0.47.1001 |
 | Crates | `netdev` |
@@ -78,4 +78,5 @@ Then update `[forks.netdev]` in `iroh-fork-manifest.toml` in the Aster repositor
 
 ## History
 
+- 2026-11-24, `aster-netdev-v0.47.1001` (`b16a3716ec`): tag created after the Aster consumer trial passed against that commit. The Aster lock holds one `netdev` at 0.47.1001 from `git+https://forge.emrul.dev/Aster/netdev.git?rev=b16a3716` (the earlier 0.45.0 and 0.46.3 copies are gone) and `patch.unused` is 0; a trial of portal_desktop (`portal-host`, `portal-edge`, `portal-saas-rpc`) took the same patch entry and checked clean with one netdev. The crate is not in the manifest's `PACKAGES` (git patch entry, not a registry crate; the manifest records it as a fork with `consumer_patch = ["netdev"]`), and `fork_compat.sh` has no suite for it. The macOS crash itself has not been reproduced: the regression test shows the crashing call is no longer made on that path, and real-world confirmation needs the ax host run through network churn on a Mac. The GitHub push mirror to `github.com/getaster/netdev` is still pending an owner decision (see Branch and tag model).
 - 2026-11-24: fork created for the iroh/noq 1.5.0 wave. `upgrade/netdev-v0.47.0` cut from `v0.47.0`, patch `macos-no-localized-display-name` and release 0.47.1001. Decision record: option C + A in the netdev macOS crash options (2026-11-03).
