@@ -71,7 +71,12 @@ pub(crate) fn get_sc_interface_map() -> HashMap<String, SCInterface> {
 
         let sc_if_type: Option<String> = sc_iface.interface_type().map(|s| s.to_string());
 
-        let friendly_name = sc_iface.localized_display_name().map(|s| s.to_string());
+        // Aster patch: do not call SCNetworkInterfaceGetLocalizedDisplayName.
+        // It can segfault inside CFNumberFormatter while the network stack is
+        // churning, and this fallback only runs when the plist read has failed,
+        // which happens during that churn. The value is cosmetic: the plist path
+        // supplies `UserDefinedName` in the normal case.
+        let friendly_name = None;
 
         let mac: Option<MacAddr> = sc_iface
             .hardware_address_string()
@@ -341,9 +346,32 @@ pub(crate) fn read_sc_plist_interface_map() -> std::io::Result<HashMap<String, S
 #[cfg(test)]
 mod tests {
     use super::{
-        load_sc_preferences_plist_map, map_ipv4_config_method_to_dhcp_v4,
+        get_sc_interface_map, load_sc_preferences_plist_map, map_ipv4_config_method_to_dhcp_v4,
         map_ipv6_config_method_to_dhcp_v6,
     };
+
+    /// The `SCNetworkInterfaceCopyAll` fallback must not ask SystemConfiguration for
+    /// localized display names: `SCNetworkInterfaceGetLocalizedDisplayName` can
+    /// segfault in CFNumberFormatter while the network stack is churning, and the
+    /// fallback only runs when the plist read has failed, which is exactly then.
+    /// A name reaching the map means the crashing call was made.
+    #[test]
+    fn sc_interface_map_does_not_read_localized_display_names() {
+        let map = get_sc_interface_map();
+        assert!(
+            !map.is_empty(),
+            "SCNetworkInterfaceCopyAll returned no BSD-named interface, so the check below proves nothing"
+        );
+        let named: Vec<_> = map
+            .iter()
+            .filter(|(_, iface)| iface.friendly_name.is_some())
+            .map(|(bsd, iface)| (bsd.as_str(), iface.friendly_name.as_deref()))
+            .collect();
+        assert!(
+            named.is_empty(),
+            "fallback map carries localized display names: {named:?}"
+        );
+    }
 
     #[test]
     fn maps_ipv4_config_methods_to_dhcp_v4_state() {
